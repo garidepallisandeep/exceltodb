@@ -16,7 +16,7 @@ spec:
           - name: prebid-server-update-tables-us
             command: ["/bin/bash","-c"]
             args: ["python /db_config_scripts/download_gcs_blob.py"]
-            image: gcr.io/newscorp-newsiq-dev/prebid-db-operations:test2
+            image: gcr.io/<project_name>/prebid-db-operations:test2
             volumeMounts:
             - name: prebid-db-service-account
               mountPath: "/secrets"
@@ -52,9 +52,9 @@ spec:
             - name: JOB_NAME
               value: prebid-db-operations
             - name: PREBID_CONFIG_AUCTION_BUCKET_NAME
-              value: "newscorp-newsiq-dev-prebid-config" 
-            - name: NEWSIQ_GCP_PROJECT
-              value: "newscorp-newsiq-dev"
+              value: "<bucket_name>" 
+            - name: GCP_PROJECT
+              value: "<project_name>"
             - name: GOOGLE_APPLICATION_CREDENTIALS
               value: "/secrets/db-backup-account.json"
             - name: PBS_MARKET_WATCH_LAST_MODIFIED_DATE
