@@ -6,7 +6,7 @@ import subprocess
 import update_prebid_server_tables
 
 bucket_name = os.getenv('PREBID_CONFIG_AUCTION_BUCKET_NAME', '')
-project_name = os.getenv('NEWSIQ_GCP_PROJECT', '')
+project_name = os.getenv('GCP_PROJECT', '')
 pbs_position_map_lmd = os.getenv('PBS_POSITION_MAP_LAST_MODIFIED_DATE', '')
 pbs_barrons_lmd = os.getenv('PBS_BARRONS_LAST_MODIFIED_DATE', '2021-06-01 17:06:52')
 print("latest_date: {}".format(pbs_barrons_lmd))
@@ -23,7 +23,7 @@ count = 0
 
 def get_gcp_project():
 
-    return os.getenv('NEWSIQ_GCP_PROJECT', 'newscorp-newsiq-dev')
+    return os.getenv('GCP_PROJECT', '')
 
 
 def get_gcs_client():
