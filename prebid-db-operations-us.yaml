@@ -1,0 +1,79 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: prebid-db-operations
+  namespace: prebid
+  labels:
+    app: prebid-db-operations
+    component: prebid-db
+spec:
+  schedule: "0 1 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:            
+          - name: prebid-server-update-tables-us
+            command: ["/bin/bash","-c"]
+            args: ["python /db_config_scripts/download_gcs_blob.py"]
+            image: gcr.io/newscorp-newsiq-dev/prebid-db-operations:test2
+            volumeMounts:
+            - name: prebid-db-service-account
+              mountPath: "/secrets"
+              readOnly: true
+            env:
+            - name: POSTGRES_PORT
+              valueFrom:
+                secretKeyRef:
+                  key: postgres-port
+                  name: prebid-postgres-us
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  key: postgres-user
+                  name: prebid-postgres-us
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: postgres-password
+                  name: prebid-postgres-us
+            - name: POSTGRES_HOST
+              valueFrom:
+                secretKeyRef:
+                  key: postgres-host
+                  name: prebid-postgres-us
+            - name: POSTGRES_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  key: postgres-database
+                  name: prebid-postgres-us                  
+            - name: GCS_KEY_FILE_PATH
+              value: "/secrets/db-backup-account.json"              
+            - name: JOB_NAME
+              value: prebid-db-operations
+            - name: PREBID_CONFIG_AUCTION_BUCKET_NAME
+              value: "newscorp-newsiq-dev-prebid-config" 
+            - name: NEWSIQ_GCP_PROJECT
+              value: "newscorp-newsiq-dev"
+            - name: GOOGLE_APPLICATION_CREDENTIALS
+              value: "/secrets/db-backup-account.json"
+            - name: PBS_MARKET_WATCH_LAST_MODIFIED_DATE
+              valueFrom:
+                secretKeyRef:
+                  key: marketwatch_lmd
+                  name: prebid-ops-file-date-list                                                   
+            - name: PBS_BARRONS_LAST_MODIFIED_DATE
+              valueFrom:
+                secretKeyRef:
+                  key: barron_lmd
+                  name: prebid-ops-file-date-list
+            - name: PBS_NY_POST_LAST_MODIFIED_DATE
+              valueFrom:
+                secretKeyRef:
+                  key: nypost_lmd
+                  name: prebid-ops-file-date-list                                                                   
+          restartPolicy: OnFailure                                                                  
+          volumes:
+          - name: prebid-db-service-account
+            secret:
+              secretName: prebid-db-service-account
